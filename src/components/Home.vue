@@ -1,7 +1,21 @@
 <template>
-    <div>
+  <el-container class="home-container">
+<!--    头部-->
+    <el-header>
+      <div>
+        <img src  ="../assets/u=2471723103,4261647594&fm=26&gp=0.jpg" class="img-size">
+        <span>电商后台管理系统</span>
+      </div>
       <el-button type="info" @click="loginOut">退出</el-button>
-    </div>
+    </el-header>
+<!--    主体部分-->
+    <el-container>
+<!--      侧边栏-->
+      <el-aside width="200px">Aside</el-aside>
+<!--      右边主体部分-->
+      <el-main>Main</el-main>
+    </el-container>
+  </el-container>
 </template>
 
 <script>
@@ -17,5 +31,24 @@ export default {
 </script>
 
 <style lang='less' scoped>
-
+.el-header{
+  background-color: #373d41;
+  display: flex;
+  justify-content: space-between;
+}
+.el-aside{
+  background-color: #333744;
+}
+.el-main{
+  background-color: #EAEDF1;
+}
+.home-container{
+  height: 100%;
+}
+.img-size{
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+/*  将头像变圆*/
+}
 </style>
