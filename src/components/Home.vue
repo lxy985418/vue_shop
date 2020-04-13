@@ -17,7 +17,7 @@
         <el-menu background-color="#333744"
           text-color="#fff"
           active-text-color="#409EFF" :unique-opened="true" :collapse=isCollapse
-                 :collapse-transition="false" :router="true" default-active=$route.path >
+                 :collapse-transition="false" :router="true" :default-active="activePath">
 <!--          :unique-opened="true" :表示变量 如果将一个Boolean改为true 也可以写成unique-opened-->
 <!--          一级菜单-->
           <el-submenu :index="item.id + ' '" v-for="item in menuList" :key="item.id">
@@ -28,7 +28,9 @@
 <!--              文本-->
               <span>{{item.authName}}</span>
             </template>
-              <el-menu-item :index="'/' + subItem.path" v-for="subItem in item.children" :key="subItem.id">
+<!--            二级菜单-->
+              <el-menu-item :index="'/' + subItem.path" @click="saveNavState('/' + subItem.path)"
+                            v-for="subItem in item.children" :key="subItem.id">
                 <template slot="title">
                   <!--              图标-->
                   <i class="el-icon-menu"></i>
@@ -50,6 +52,8 @@
 export default {
   created () {
     this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
+    // console.log(this.activePath)
   },
   data () {
     return {
@@ -61,7 +65,8 @@ export default {
         102: 'iconfont icon-danju',
         145: 'iconfont icon-baobiao'
       },
-      isCollapse: false
+      isCollapse: false,
+      activePath: ''
     }
   },
   methods: {
@@ -75,8 +80,14 @@ export default {
       this.menuList = res.data
       console.log(res)
     },
+    // 点击按钮，切换菜单的折叠与展开
     togglaCollapse () {
       this.isCollapse = !this.isCollapse
+    },
+    // 保存链接的激活状态
+    saveNavState (activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
+      this.activePath = activePath
     }
   }
 }
