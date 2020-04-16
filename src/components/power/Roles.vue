@@ -63,10 +63,10 @@
         <!--    内容主题区域-->
         <el-form :model="addRoleForm" :rules="addRoleFormRules" ref="addRoleRef"
                  label-width="70px" >
-          <el-form-item label="角色名" prop="roleName">
+          <el-form-item label-width="100px" label="角色名称" prop="roleName">
             <el-input v-model="addRoleForm.roleName"></el-input>
           </el-form-item>
-          <el-form-item  label="描述" prop="roleDesc">
+          <el-form-item label-width="100px"  label="角色描述" prop="roleDesc">
             <el-input  v-model="addRoleForm.roleDesc"></el-input>
           </el-form-item>
         </el-form>
