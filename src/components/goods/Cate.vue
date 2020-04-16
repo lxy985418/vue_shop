@@ -41,20 +41,18 @@
       :visible.sync="addCateVisible"  @close="addDialogClose">
       <!--    内容主题区域-->
       <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef"
-               label-width="70px" >
+               label-width="100px">
         <el-form-item label-width="100px" label="分类名称" prop="cat_name">
           <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
-        <el-form-item label-width="100px"  label="父级分类">
+        <el-form-item label-width="100px"   label="父级分类">
 <!--          options指定选择源对象 props指定配置对象-->
           <el-cascader
-            expand-trigger="hover"
             :options="parentCateList"
-            :props="cascaderProps"
+            :props="{ checkStrictly:true, expandTrigger: 'hover' , value: 'cat_id',  label: 'cat_name',  children: 'children'}"
             v-model="selectedKeys"
             @change="parentCateChanged"
-            clearable
-            change-on-select>
+            clearable>
           </el-cascader>
         </el-form-item>
       </el-form>
@@ -121,11 +119,6 @@ export default {
         }]
       },
       parentCateList: [],
-      cascaderProps: {
-        value: 'cat_id',
-        label: 'cat_name',
-        children: 'children'
-      },
       // 选中的父级ID数组
       selectedKeys: []
     }
