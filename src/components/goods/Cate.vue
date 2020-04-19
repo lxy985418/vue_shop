@@ -26,9 +26,9 @@
           <el-tag type="warning" size="mini" v-else>三级</el-tag>
         </template>
         <!-- 操作 -->
-        <template slot="opt" slot-scope="">
-          <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+        <template slot="opt" slot-scope="scope">
+          <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEidtDialog(scope.row.cat_id)">编辑</el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeCate(scope.row,scope.row.cat_id)">删除</el-button>
         </template>
       </tree-table>
       <!-- 分页区域 -->
@@ -47,6 +47,7 @@
         </el-form-item>
         <el-form-item label-width="100px"   label="父级分类">
 <!--          options指定选择源对象 props指定配置对象-->
+<!--          新版将语法更改 属性需要在props中用数组实现-->
           <el-cascader
             :options="parentCateList"
             :props="{ checkStrictly:true, expandTrigger: 'hover' , value: 'cat_id',  label: 'cat_name',  children: 'children'}"
@@ -59,6 +60,23 @@
       <span slot="footer" class="dialog-footer">
     <el-button @click="addCateVisible = false">取 消</el-button>
     <el-button type="primary" @click="addCate">确 定</el-button>
+  </span>
+    </el-dialog>
+<!--    修改商品分类-->
+    <el-dialog
+      title="修改商品分类"
+      :visible.sync="editDialogVisible"
+      @close="editDialogClose">
+      <!--    内容主题区域-->
+      <el-form :model="editCate" :rules="addCateFormRules" ref="editCateRef"
+               label-width="70px" >
+        <el-form-item label-width="120px" label="商品分类名称" prop="cat_name">
+          <el-input v-model="editCate.cat_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="editDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="editCateInfo">确 定</el-button>
   </span>
     </el-dialog>
   </div>
@@ -106,21 +124,26 @@ export default {
       },
       addCateFormRules: {
         cat_name: [{
+          // 标记必填项
           required: true,
           message: '请输入商品类型名称',
           trigger: 'blur'
         },
         //    失去焦点时触发
         {
-          min: 3,
+          min: 2,
           max: 10,
-          message: '商品类型名称长度在3到10长度之间',
+          message: '商品分类名称长度在2到10长度之间',
           trigger: 'blur'
         }]
       },
       parentCateList: [],
       // 选中的父级ID数组
-      selectedKeys: []
+      selectedKeys: [],
+      editDialogVisible: false,
+      editCate: {
+        cat_name: ''
+      }
     }
   },
   created () {
@@ -195,6 +218,51 @@ export default {
         this.getCateList()
         this.addCateVisible = false
       })
+    },
+    async showEidtDialog (id) {
+      console.log(id)
+      const { data: res } = await this.$http.get('categories/' + id)
+      if (res.meta.status !== 200) return this.$message.error('获取失败，请稍后再试')
+      this.editCate = res.data
+      this.editDialogVisible = true
+    },
+    editCateInfo () {
+      this.$refs.editCateRef.validate(async valid => {
+        if (!valid) return
+        // console.log(valid)
+        const { data: res } = await this.$http.put('categories/' + this.editCate.cat_id, this.editCate)
+        if (res.meta !== 200) {
+          this.$message.error('修改失败')
+        }
+        this.$message.success('修改商品分类成功')
+        // 隐藏添加对话框
+        this.editDialogVisible = false
+        this.getCateList()
+      })
+    },
+    editDialogClose () {
+      this.$refs.editCateRef.resetFields()
+    },
+    async removeCate (cote, id) {
+      const confirmResult = await this.$confirm('此操作将永久删除该权限, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      //  如果用户点击删除返回值为字符串confirm
+      //  如果用户点击取消返回值为字符串cancel
+      if (confirmResult === 'cancel') {
+        return this.$message.info('已取消删除')
+      }
+      if (confirmResult === 'confirm') {
+        const { data: res } = await this.$http.delete(
+          'categories/' + id)
+        if (res.meta !== 200) {
+          this.$message.error('删除商品分类失败')
+        }
+        this.$message.success('删除商品分类成功')
+        this.getCateList()
+      }
     }
   }
 }

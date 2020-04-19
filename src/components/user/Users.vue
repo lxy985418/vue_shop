@@ -92,7 +92,7 @@
   <el-dialog
     title="修改用户"
     :visible.sync="editDialogVisible"
-    width="50%">
+    width="50%" @close="editDialogClose">
     <el-form :model="editForm" :rules="addFormRules" ref="editFormRef"
              label-width="70px" >
       <el-form-item label="用户名">
@@ -363,6 +363,9 @@ export default {
     closeSetRole () {
       this.setRoleId = ''
       this.userInfo = []
+    },
+    editDialogClose () {
+      this.$refs.editFormRef.resetFields()
     }
   }
 }

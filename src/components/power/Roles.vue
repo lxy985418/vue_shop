@@ -47,7 +47,7 @@
           <el-table-column label="操作" prop="level">
             <template slot-scope="scope">
               <!--            修改按钮-->
-              <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.id)">编辑</el-button>
               <!--            删除按钮-->
               <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeRole(scope.row.id)">删除</el-button>
               <!--            分配角色按钮-->
@@ -88,6 +88,26 @@
     <el-button @click="addRightDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="allotRights">确 定</el-button>
   </span>
+<!--        修改角色-->
+      </el-dialog>
+      <el-dialog
+        title="修改角色"
+        :visible.sync="editDialogVisible"
+        @close="editDialogClose">
+        <!--    内容主题区域-->
+        <el-form :model="editRole" :rules="addRoleFormRules" ref="editRoleRef"
+                 label-width="70px" >
+          <el-form-item label-width="100px" label="角色名称" prop="roleName">
+            <el-input v-model="editRole.roleName"></el-input>
+          </el-form-item>
+          <el-form-item label-width="100px"  label="角色描述" prop="roleDesc">
+            <el-input  v-model="editRole.roleDesc"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+    <el-button @click="editDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="editRoleInfo">确 定</el-button>
+  </span>
       </el-dialog>
     </div>
 </template>
@@ -123,9 +143,9 @@ export default {
         },
         //    失去焦点时触发
         {
-          min: 3,
+          min: 2,
           max: 10,
-          message: '用户名长度在3到10长度之间',
+          message: '角色名称长度在3到10长度之间',
           trigger: 'blur'
         }
         ],
@@ -134,6 +154,11 @@ export default {
           message: '用户名描述不能超过25',
           trigger: 'blur'
         }]
+      },
+      editDialogVisible: false,
+      editRole: {
+        roleName: '',
+        roleDesc: ''
       }
     }
   },
@@ -204,6 +229,7 @@ export default {
           this.$message.error('删除权限失败')
         }
         this.$message.success('删除权限成功')
+        // 删除完后data会返回更新过后的数据
         role.children = res.data
       }
     },
@@ -242,6 +268,29 @@ export default {
       this.$message.success('分配权限成功')
       this.getRolesList()
       this.addRightDialogVisible = false
+    },
+    async showEditDialog (id) {
+      const { data: res } = await this.$http.get('roles/' + id)
+      if (res.meta.status !== 200) return this.$message.error('获取失败，请稍后再试')
+      this.editRole = res.data
+      this.editDialogVisible = true
+    },
+    editRoleInfo () {
+      this.$refs.editRoleRef.validate(async valid => {
+        if (!valid) return
+        // console.log(valid)
+        const { data: res } = await this.$http.put('roles/' + this.editRole.roleId, this.editRole)
+        if (res.meta !== 200) {
+          this.$message.error('修改失败')
+        }
+        this.$message.success('修改用户成功')
+        // 隐藏添加对话框
+        this.editDialogVisible = false
+        this.getRolesList()
+      })
+    },
+    editDialogClose () {
+      this.$refs.editRoleRef.resetFields()
     }
   }
 }
