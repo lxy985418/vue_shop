@@ -5,4 +5,31 @@ body,
     height: 100%;
     margin: 0;
     padding: 0;
+    min-width: 1500px;
+/*    最小宽度*/
+}
+.el-breadcrumb{
+ margin-bottom: 15px;
+    font-size: 15px;
+}
+.el-card {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0)!important;
+}
+.el-table {
+    margin-top: 15px;
+}
+.el-pagination {
+    margin-top: 15px;
+}
+/*调整Cascader 高度*/
+.el-cascader-panel {
+    height: 200px;
+}
+.el-steps {
+    margin: 15px;
+    display: flex;
+    justify-content: center;
+}
+.ql-editor {
+    min-height: 300px;
 }
